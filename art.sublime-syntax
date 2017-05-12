@@ -24,7 +24,7 @@ contexts:
       scope: keyword.operator.delimiter.art, punctuation.definition.javascript.end.art
       pop: true
     - match: ''
-      push: Packages/art/javascript.sublime-syntax
+      push: Packages/art/syntaxs/javascript.sublime-syntax
       with_prototype:
         - match: '(?=[_-]?%>)'
           scope: punctuation.definition.javascript.end.art
@@ -39,7 +39,7 @@ contexts:
       scope: keyword.operator.delimiter.art, punctuation.definition.javascript.end.art
       pop: true
     - match: ''
-      push: Packages/art/normal.sublime-syntax
+      push: Packages/art/syntaxs/normal.sublime-syntax
       with_prototype:
         - match: '(?=}})'
           scope: punctuation.definition.javascript.end.art
