@@ -1,0 +1,46 @@
+%YAML 1.2
+---
+name: art
+file_extensions: [art]
+first_line_match: ^<%|^{{
+scope: text.art.percentsign
+
+contexts:
+  main:
+    - match: ''
+      push: Packages/HTML/HTML.sublime-syntax
+      with_prototype:
+        - match: '<%#'
+          scope: punctuation.definition.javascript_comment.begin.art
+          push: javascript_comment
+        - match: '<%(?!%)[=_-]?'
+          scope: keyword.operator.delimiter.art, punctuation.definition.javascript.begin.art
+          push: javascript
+        - match: '{{'
+          scope: keyword.operator.delimiter.art, punctuation.definition.normal.begin.art
+          push: normal
+  javascript:
+    - match: '[_-]?%>'
+      scope: keyword.operator.delimiter.art, punctuation.definition.javascript.end.art
+      pop: true
+    - match: ''
+      push: Packages/art/javascript.sublime-syntax
+      with_prototype:
+        - match: '(?=[_-]?%>)'
+          scope: punctuation.definition.javascript.end.art
+          pop: true
+  javascript_comment:
+    - meta_scope: comment.block.art
+    - match: '%>'
+      scope: punctuation.definition.javascript_comment.end.art
+      pop: true
+  normal:
+    - match: '}}'
+      scope: keyword.operator.delimiter.art, punctuation.definition.javascript.end.art
+      pop: true
+    - match: ''
+      push: Packages/art/normal.sublime-syntax
+      with_prototype:
+        - match: '(?=}})'
+          scope: punctuation.definition.javascript.end.art
+          pop: true

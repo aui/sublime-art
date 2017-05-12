@@ -1,0 +1,10 @@
+<snippet>
+	<content><![CDATA[
+{{each ${1:list}}}
+	\$value $2
+{{/each}}$0
+]]></content>
+	<tabTrigger>each</tabTrigger>
+	<scope>text.art.percentsign - source.js</scope>
+	<description>  {{each list}}</description>
+</snippet>

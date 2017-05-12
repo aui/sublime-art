@@ -1,0 +1,284 @@
+%YAML 1.2
+---
+name: normal
+scope: normal.art
+
+variables:
+  ident: '[_$a-zA-Z][$\w]*'
+
+contexts:
+  main:
+    - include: core
+
+  prototype:
+    - include: comments
+
+  core:
+    - include: literal-keywords
+
+    - include: literal-number
+    - include: literal-template-string
+    - include: literal-string
+    - include: literal-language-constant
+
+    - include: literal-method-call
+    - include: literal-function-call
+
+    - include: literal-operators
+
+  literal-keywords:
+    - match: (?<!\.)\b(?>if|else|each|set|extend|block|include)\b
+      scope: keyword.control
+    - match: (?<!\.)\b(?>typeof)\b
+      scope: keyword.control
+  literal-number:
+    - match: (?i)(?:\B[-+]|\b)0x[0-9a-f]*\.(\B|\b[0-9]+)
+      scope: invalid.illegal.numeric.hex.js
+
+    - match: (?:\B[-+]|\b)0[0-9]+\.(\B|\b[0-9]+)
+      scope: invalid.illegal.numeric.octal.js
+
+    - match: >-
+        (?xi)
+          (?:\B[-+])?
+          (?:
+            \b0b[0-1]*|                 # binary
+            \b0o[0-7]*|                 # octal
+            \b0x[0-9a-f]*|              # hex
+            (
+              \B\.[0-9]+|               # e.g. .999
+              \b[0-9]+(\.[0-9]*)?       # e.g. 999.999, 999. or 999
+            )(e[-+]?[0-9]+)?            # e.g. e+123, E-123
+          )
+      scope: constant.numeric.js
+
+    - match: (?:\B[-+]|\b)(Infinity)\b
+      scope: constant.language.infinity.js
+  literal-string:
+    - match: (["'])
+      scope: punctuation.definition.string.quoted.begin.js
+      push:
+        - meta_include_prototype: false
+        - meta_scope: string.quoted.js
+        - match: \n
+          scope: invalid.illegal.newline.js
+          pop: true
+        - match: \1
+          scope: punctuation.definition.string.quoted.end.js
+          pop: true
+        - include: string-content
+
+  literal-template-string:
+    - match: '`'
+      scope: keyword.other.template.begin.js
+      push: template-string-body
+
+  template-string-body:
+    - meta_include_prototype: false
+    - meta_scope: string.interpolated.js
+    - match: \\`
+      scope: constant.character.escape.js
+    - match: '`'
+      scope: keyword.other.template.end.js
+      pop: true
+    - match: \${
+      scope: keyword.other.substitution.begin.js
+      set:
+        - match: '}'
+          scope: keyword.other.substitution.end.js
+          set: template-string-body
+        - include: expression
+    - include: string-content
+
+  string-content:
+    # https://mathiasbynens.be/notes/javascript-escapes
+    - match: \\\s*\n
+      scope: constant.character.escape.newline.js
+
+    - match: \\([1-7][0-7]{0,2}|[0-7]{2,3}|[bfnrtv0'"\\]|x\h{2}|u\{\h+\}|u\h{4})
+      scope: constant.character.escape.js
+  literal-language-constant:
+    - match: (?<!\.)\b(true)\b
+      scope: constant.language.boolean.true.js
+
+    - match: (?<!\.)\b(false)\b
+      scope: constant.language.boolean.false.js
+
+    - match: (?<!\.)\b(null)\b
+      scope: constant.language.null.js
+
+    - match: (?<!\.)\b(undefined)\b
+      scope: constant.language.undefined.js
+
+    - match: (?<!\.)\b(NaN)\b
+      scope: constant.language.nan.js
+
+  literal-method-call:
+    - match: >-
+        (?x)
+          (?:(?<=\.)|\b)
+          ([A-Z][$\w]*)\s*(\.)
+          ({{ident}})\s*
+          (\(\s*\))
+      scope: meta.function-call.static.without-arguments.js
+      captures:
+        1: variable.other.class.js
+        2: keyword.operator.accessor.js
+        3: variable.function.js
+        4: meta.group.braces.round.function.arguments.js
+
+    - match: >-
+        (?x)
+          (?:(?<=\.)|\b)
+          ([A-Z][$\w]*)\s*(\.)
+          ({{ident}})\s*
+          (?=\()
+      scope: meta.function-call.static.with-arguments.js
+      captures:
+        1: variable.other.class.js
+        2: keyword.operator.accessor.js
+        3: variable.function.js
+
+    - match: >-
+        (?x)
+          (?<=\.)
+          ({{ident}})\s*
+          (\(\s*\))
+      scope: meta.function-call.method.without-arguments.js
+      captures:
+        1: variable.function.js
+        2: meta.group.braces.round.function.arguments.js
+
+    - match: >-
+        (?x)
+          (?<=\.)
+          ({{ident}})\s*
+          (?=\()
+      scope: meta.function-call.method.with-arguments.js
+      captures:
+        1: variable.function.js
+  literal-function-call:
+    - match: ({{ident}})\s*(\(\s*\))
+      scope: meta.function-call.without-arguments.js
+      captures:
+        1: variable.function.js
+        2: meta.group.braces.round.function.arguments.js
+
+    - match: ({{ident}})\s*(?=\()
+      scope: meta.function-call.with-arguments.js
+      captures:
+        1: variable.function.js
+
+    - match: ({{ident}})\s*(?=`)
+      scope: meta.function-call.tagged-template.js
+      captures:
+        1: variable.function.js
+  literal-operators:
+    - match: >-
+        (?x)
+          !(?!=)| # logical-not     right-to-left   right
+          &&    | # logical-and     left-to-right   both
+          \|\|  | # logical-or      left-to-right   both
+      scope: keyword.operator.logical.js
+
+    - match: >-
+        (?x)
+          =(?!=)| # assignment      right-to-left   both
+      scope: keyword.operator.assignment.js
+
+    - match: >-
+        (?x)
+          %=   | # assignment      right-to-left   both
+          &=   | # assignment      right-to-left   both
+          \*=  | # assignment      right-to-left   both
+          \+=  | # assignment      right-to-left   both
+          -=   | # assignment      right-to-left   both
+          /=   | # assignment      right-to-left   both
+          \^=  | # assignment      right-to-left   both
+          \|=  | # assignment      right-to-left   both
+          <<=  | # assignment      right-to-left   both
+          >>=  | # assignment      right-to-left   both
+          >>>= | # assignment      right-to-left   both
+      scope: keyword.operator.assignment.augmented.js
+
+    - match: >-
+        (?x)
+          ~    | # bitwise-not     right-to-left   right
+          <<   | # bitwise-shift   left-to-right   both
+          >>>  | # bitwise-shift   left-to-right   both
+          >>   | # bitwise-shift   left-to-right   both
+          &    | # bitwise-and     left-to-right   both
+          \^   | # bitwise-xor     left-to-right   both
+          \|     # bitwise-or      left-to-right   both
+      scope: keyword.operator.bitwise.js
+
+    - match: >-
+        (?x)
+          <=   | # relational      left-to-right   both
+          >=   | # relational      left-to-right   both
+          <    | # relational      left-to-right   both
+          >      # relational      left-to-right   both
+      scope: keyword.operator.relational.js
+
+    - match: >-
+        (?x)
+          ===  | # equality        left-to-right   both
+          !==  | # equality        left-to-right   both
+          ==   | # equality        left-to-right   both
+          !=     # equality        left-to-right   both
+      scope: keyword.operator.comparison.js
+
+    - match: >-
+        (?x)
+          --   | # decrement       n/a             right-or-left
+          \+\+ | # increment       n/a             right-or-left
+          /    | # division        left-to-right   both
+          %    | # modulus         left-to-right   both
+          \*   | # multiplication  left-to-right   both
+          \+   | # addition        left-to-right   both
+          -      # subtraction     left-to-right   both
+      scope: keyword.operator.arithmetic.js
+
+    - match: '[?:]'
+      scope: keyword.operator.ternary.js
+
+    - match: (?<!\.)\.\.\.
+      scope: keyword.operator.spread.js
+
+    - match: \.
+      scope: keyword.operator.accessor.js
+  comments:
+    - match: /\*\*(?!/)
+      scope: punctuation.definition.comment.js
+      push:
+        - meta_scope: comment.block.documentation.js
+        - match: \*/
+          scope: punctuation.definition.comment.js
+          pop: true
+
+    - match: /\*
+      scope: punctuation.definition.comment.begin.js
+      push:
+        - meta_scope: comment.block.js
+        - match: \*/
+          scope: punctuation.definition.comment.end.js
+          pop: true
+
+    - match: (?><!--|-->)
+      scope: comment.block.html.js
+      captures:
+        0: punctuation.definition.comment.js
+
+    - match: //
+      scope: punctuation.definition.comment.js
+      push:
+        - meta_scope: comment.line.double-slash.js
+        - match: $\n?
+          pop: true
+
+    - match: ^#!
+      scope: punctuation.definition.comment.js
+      push:
+        - meta_scope: comment.line.shebang.js
+        - match: $
+          pop: true
