@@ -16,7 +16,7 @@ contexts:
         - match: '<%(?!%)[=_-]?'
           scope: keyword.operator.delimiter.art, punctuation.definition.javascript.begin.art
           push: javascript
-        - match: '{{'
+        - match: '{{@?'
           scope: keyword.operator.delimiter.art, punctuation.definition.normal.begin.art
           push: normal
   javascript:

@@ -28,7 +28,9 @@ contexts:
 
   literal-keywords:
     - match: (?<!\.)\b(?>if|else|each|set|extend|block|include)\b
-      scope: keyword.control
+      scope: storage.type.js
+    - match: (?<!\.)\/(?>if|each|block)\b
+      scope: storage.type.js
     - match: (?<!\.)\b(?>typeof)\b
       scope: keyword.control
   literal-number:
