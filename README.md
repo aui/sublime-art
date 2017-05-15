@@ -12,9 +12,9 @@ art-template syntax definition for Sublime Text 3. Works with [art-template](htt
 
 > Note: Don't forget to restart Sublime Text after installing this package.
 
-## Example (with *Dracula art*)
+## Preview
 
-![example](example.png)
+![preview](preview.png)
 
 ## Snippets
 
