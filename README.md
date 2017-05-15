@@ -4,9 +4,17 @@ art-template syntax definition for Sublime Text 3. Works with [art-template](htt
 
 > Requires Sublime Text 3 build >=3103
 
+## Installation
+
+1. [Download the .zip](https://github.com/aui/sublime-art/releases)
+2. Unzip and rename folder to `art`
+3. Copy folder into `Packages` directory, which you can find using the menu item `Preferences → Browse Packages...`
+
+> Note: Don't forget to restart Sublime Text after installing this package.
+
 ## Example (with *Dracula art*)
 
-![](example.png)
+![example](example.png)
 
 ## Snippets
 
